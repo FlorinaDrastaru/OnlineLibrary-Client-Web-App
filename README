@@ -1,0 +1,48 @@
+// DRASTARU FLORINA CRISTINA 325CA
+
+TEMA 3 - PROTOCOALE DE COMUNICATII
+
+Am realizat tema pe baza laboratorului 10, pe care l-am folosit ca schelet.
+Am preluat din lab10 fisierele buffer.c, buffer.h, helpers.c, helpers.h si
+requests.c, requests.h, la care am adaugat alte functii necesare aplicatiei mele.
+In helpers am adaugat functiile :
+    - dealWithServer 
+            - deschide conexiune
+            - trimite mesaj la server, primeste raspuns, il afiseaza, le sterge 
+               si inchide conexiunea
+    - makePrompUserPass - creeaza prompt pt a introduce de la tastatura user si parola
+    - makePromptBook - creeaza prompt pt a introduce caracteristicile unei carti
+    - checkBook - verifica daca caracteristicile unei carti au formatul corect
+
+Pentru parsarea mesajelor am folosit biblioteca parson, asa cum ne-a fost recomandat.
+Folosesc functii din aceasta biblioteca pentru a forma obiecte de tip json.
+
+STRUCTURA SI IMPLEMENTARE
+
+requests.c contine implementarea functiilor de request(pentru GET, POST, DELETE).
+Pe primele 2 le-am preluat din lab, insa am adaugat ca parametru si token-ul, 
+de care am nevoie pentru a face anumite requesturi. Daca token-ul exista, il 
+adaug in header-ul Authorization pentru a-l putea trimite catre server.
+Functia compute_delete_request este similara celei de get.
+
+In client.c, verific intotdeauna comanda citita de la tastatura si execut anumiti
+pasi in functie de aceasta. De fiecare data, trimit mesaj la server, primesc raspunsul
+il afisez, apoi sterg mesajul si raspunsul pentru a le folosi la urmatoarea actiune. 
+De asemenea, tratez separat anumite cazuri de eroare(pentru care serverul nu trimite mesaj de eroare) 
+si afisez mesaje corespunzatoare:
+    - daca exista deja un utilizator logat(verific cookie)
+    - daca userul e autentificat cand vrea sa intre in biblioteca(verific cookie)
+    - daca userul are acces la librarie(verific token-ul)
+    - daca formatul unei carti de adaugat este corect
+    - daca utilizatorul este logat atunci cand vrea sa se delogheze(cookie)
+Am incercat sa tin conexiunea deschisa permanent cat timp se citeste de la tastatura, 
+insa primeam time-out, asa ca o deschid inainte sa trimit mesajul la server si o inchid 
+dupa ce primesc raspuns.
+
+Requesturile pentru diferite comenzi se bazeaza pe 2 parametri importanti: cookie si token.
+Atunci cand primesc comanda login, serverul trimite un raspuns, din care extrag cookie-ul, pe care
+il folosesc pentru a demonstra ca userul e logat.
+Atunci cand primesc comanda enter_library, extrag din mesajul serverului token-ul, pe care il 
+folosesc pentru a demonstra ca userul are acces la biblioteca.
+Atunci cand primesc comanda logout, resetez cookie si token, iar acestea urmeaza a fi extrase
+din nou in functie de noul utilizator care se va loga.
